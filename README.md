@@ -1,1 +1,1 @@
-# node-chat
+# Chat app made with node
