@@ -6,10 +6,10 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const cors = require('cors');
-app.use(cors());
+app.use(cors({ credentials: true, origin: true }));
 const io = require('socket.io')(http, {
     cors: {
-        origin: [process.env.ORIGIN]
+        origin: true
     }
 });
 const Message = require('./database/models/message');
