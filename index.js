@@ -6,13 +6,17 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const cors = require('cors');
-app.use(cors({ credentials: true, origin: true }));
+const router = require('./routers/user');
+
 const io = require('socket.io')(http, {
     cors: {
         origin: true
     }
 });
 const Message = require('./database/models/message');
+
+app.use(cors({ credentials: true, origin: true }));
+app.use('/user', router);
 
 io.on('connection', (socket) => {
     socket.on('chat message', (message) => {

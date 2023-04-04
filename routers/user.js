@@ -10,9 +10,9 @@ const User = require("../database/models/user");
 
 router.post("/signup", async (req, res, next) => {
   try {
-    const { email, nickname, password } = req.body;
+    const { email, username, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = User.create({ email, nickname, password: hashedPassword });
+    const user = User.create({ email, username, password: hashedPassword });
     const token = jwt.sign(
       { userId: user._id },
       process.env.ACCESS_TOKEN_SECRET,
