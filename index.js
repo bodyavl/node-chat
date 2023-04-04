@@ -21,11 +21,6 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('receive message', message);
       });
 });
-app.get('/api/messages', (req, res) => {
-    const messages = Message.find({});
-    if(!messages) res.sendStatus(404);
-    res.json(messages);
-})
 
 http.listen(process.env.PORT, () => {
     console.log(`On port ${process.env.PORT}`)
