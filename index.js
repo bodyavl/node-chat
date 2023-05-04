@@ -20,8 +20,6 @@ app.use('/user', router);
 
 io.on('connection', (socket) => {
     socket.on('chat message', (message) => {
-        const {text, username} = message;
-        Message.create({text, username});
         socket.broadcast.emit('receive message', message);
       });
 });
