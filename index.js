@@ -13,7 +13,6 @@ const io = require('socket.io')(http, {
         origin: true
     }
 });
-const Message = require('./database/models/message');
 
 app.use(cors({ credentials: true, origin: true }));
 app.use('/user', router);
