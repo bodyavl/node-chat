@@ -6,7 +6,7 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const cors = require('cors');
-const router = require('./routers/user');
+const { userRouter } = require('./routers/user');
 
 const io = require('socket.io')(http, {
     cors: {
@@ -15,7 +15,7 @@ const io = require('socket.io')(http, {
 });
 
 app.use(cors({ credentials: true, origin: true }));
-app.use('/user', router);
+app.use('/user', userRouter);
 
 io.on('connection', (socket) => {
     socket.on('chat message', (message) => {
