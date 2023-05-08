@@ -12,7 +12,7 @@ let refreshTokens = [];
 
 router.post('/signup', async (req, res, next) => {
     try {
-        const { email, username, password } = req.body;
+        const { username, password } = req.body;
     
         const hashedPassword = await bcrypt.hash(password, 10);
     
