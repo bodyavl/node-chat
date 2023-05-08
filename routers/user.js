@@ -64,8 +64,8 @@ router.post('/token', (req, res, next) => {
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
         if (err) res.sendStatus(401);
         refreshTokens = refreshTokens.filter(token => token !== refreshToken);
-        const newRefreshToken = generateRefreshToken({_id: user.userId, email: user.email})
-        const accessToken = generateAccessToken({_id: user.userId, email: user.email});
+        const newRefreshToken = generateRefreshToken({_id: user.userId })
+        const accessToken = generateAccessToken({_id: user.userId });
         res.json({ accessToken, refreshToken: newRefreshToken })
         })
     } catch (error) {
@@ -97,11 +97,11 @@ function authToken(req, res, next) {
 }
 
 function generateAccessToken(user) {
-    return jwt.sign({ userId: user._id, email: user.email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+    return jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
 }
 
 function generateRefreshToken(user) {
-  return jwt.sign({ userId: user._id, email: user.email }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '30d' });
+  return jwt.sign({ userId: user._id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '30d' });
 }
 
 module.exports = { userRouter: router, authToken };
