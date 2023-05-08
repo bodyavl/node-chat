@@ -4,6 +4,7 @@ dotenv.config();
 require('./database');
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
 const http = require('http').Server(app);
 const cors = require('cors');
 const { userRouter } = require('./routers/user');
@@ -14,6 +15,8 @@ const io = require('socket.io')(http, {
     }
 });
 
+app.use(express.urlencoded({extended: true}))
+app.use(bodyParser.json({type: 'application/json'}));
 app.use(cors({ credentials: true, origin: true }));
 app.use('/user', userRouter);
 

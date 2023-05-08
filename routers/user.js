@@ -10,19 +10,29 @@ const User = require("../database/models/user");
 
 let refreshTokens = [];
 
+router.get('/search', authToken, async(req, res, next) => {
+  try {
+    const { q } = req.query;
+    const users = await User.find({ _id: { $ne: req.user.userId }, username: { $regex: `(?i)${q}(?-i)`,} }).select('_id username');;
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+})
 router.post('/signup', async (req, res, next) => {
     try {
         const { username, password } = req.body;
-    
+        
         const hashedPassword = await bcrypt.hash(password, 10);
     
         const user = await User.create({
           username,
           password: hashedPassword
         });
-    
+        
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
+
         refreshTokens.push(refreshToken);
     
         res.status(200).send({ accessToken, refreshToken, username: user.username });
@@ -97,7 +107,7 @@ function authToken(req, res, next) {
 }
 
 function generateAccessToken(user) {
-    return jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+  return jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
 }
 
 function generateRefreshToken(user) {
