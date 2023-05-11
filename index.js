@@ -9,7 +9,6 @@ const http = require('http').Server(app);
 const cors = require('cors');
 const { userRouter } = require('./routers/user');
 const { messageRouter } = require('./routers/message.js')
-const Chat = require('./database/models/Chat');
 const Message = require('./database/models/message');
 
 const io = require('socket.io')(http, {
