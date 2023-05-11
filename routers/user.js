@@ -50,7 +50,7 @@ router.post('/signup', async (req, res, next) => {
 router.post("/login", async (req, res, next) => {
     try {
       const { username, password } = req.body;
-  
+      
       const user = await User.findOne({ username });
       
       const isMatch = await bcrypt.compare(password, user.password);
@@ -58,7 +58,8 @@ router.post("/login", async (req, res, next) => {
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
         refreshTokens.push(refreshToken);
-        res.status(200).send({ accessToken, refreshToken, username: user.username });  
+        
+        res.status(200).send({ ...user._doc, accessToken, refreshToken });  
       } else res.sendStatus(403);
     } catch (error) {
       next(error);
