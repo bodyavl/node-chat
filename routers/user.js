@@ -55,13 +55,33 @@ router.get('/chats', authToken, async (req, res, next) => {
         $all: [req.user.userId],
       },
     }).sort({ updatedAt: -1 });
-    let uniqueUsers = []
+
+    let uniqueUsers = new Map();
+
     messages.map(message => {
       const user = message.users.filter(item => item !== req.user.userId)[0];
-      if(!uniqueUsers.includes(user)) uniqueUsers.push(user);
+      if(!uniqueUsers.has(user)) 
+      {
+        uniqueUsers.set(user, message);
+      } 
     })
-    const users = await User.find({ _id: { $in: [...uniqueUsers]}})
-    const projectedUsers = uniqueUsers.map(id => users.find(user => user._id.toString() === id))
+    const userIds = uniqueUsers.keys();
+    const users = await User.find({ _id: { $in: [...userIds]}}).lean();
+
+    const projectedUsers = [];
+     uniqueUsers.forEach((value, key) => {
+      let returnUser = users.find(user => user._id.toHexString() === key);
+
+      projectedUsers.push(
+        { ...returnUser, 
+          lastMessage: {
+            fromSelf: value.sender.toString() === req.user.userId,
+            content: value.message.text,
+        }});
+    } )
+
+    console.log(projectedUsers);
+
     res.json(projectedUsers);
   } catch (error) {
     next(error);
