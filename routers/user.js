@@ -77,6 +77,7 @@ router.get('/chats', authToken, async (req, res, next) => {
           lastMessage: {
             fromSelf: value.sender.toString() === req.user.userId,
             content: value.message.text,
+            updatedAt: value.updatedAt
         }});
     } )
 
