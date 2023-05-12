@@ -60,7 +60,7 @@ router.get('/chats', authToken, async (req, res, next) => {
       const user = message.users.filter(item => item !== req.user.userId)[0];
       if(!uniqueUsers.includes(user)) uniqueUsers.push(user);
     })
-    const users = await User.find({ _id: { $in: [uniqueUsers]}})
+    const users = await User.find({ _id: { $in: [...uniqueUsers]}})
     res.json(users);
   } catch (error) {
     next(error);
