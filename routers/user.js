@@ -61,7 +61,8 @@ router.get('/chats', authToken, async (req, res, next) => {
       if(!uniqueUsers.includes(user)) uniqueUsers.push(user);
     })
     const users = await User.find({ _id: { $in: [...uniqueUsers]}})
-    res.json(users);
+    const projectedUsers = uniqueUsers.map(id => users.find(user => user._id.toString() === id))
+    res.json(projectedUsers);
   } catch (error) {
     next(error);
   }
