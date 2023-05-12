@@ -80,8 +80,6 @@ router.get('/chats', authToken, async (req, res, next) => {
         }});
     } )
 
-    console.log(projectedUsers);
-
     res.json(projectedUsers);
   } catch (error) {
     next(error);
