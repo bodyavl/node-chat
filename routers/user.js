@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const User = require("../database/models/user");
+const Message = require("../database/models/message");
 
 let refreshTokens = [];
 
@@ -46,6 +47,25 @@ router.post('/signup', async (req, res, next) => {
         
       }
 });
+
+router.get('/chats', authToken, async (req, res, next) => {
+  try {
+    const messages = await Message.find({
+      users: {
+        $all: [req.user.userId],
+      },
+    }).sort({ updatedAt: 1 });
+    let uniqueUsers = []
+    messages.map(message => {
+      const user = message.users.filter(item => item !== req.user.userId)[0];
+      if(!uniqueUsers.includes(user)) uniqueUsers.push(user);
+    })
+    const users = await User.find({ _id: { $in: [uniqueUsers]}})
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+})
 
 router.post("/login", async (req, res, next) => {
     try {
