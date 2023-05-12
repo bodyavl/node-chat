@@ -54,7 +54,7 @@ router.get('/chats', authToken, async (req, res, next) => {
       users: {
         $all: [req.user.userId],
       },
-    }).sort({ updatedAt: 1 });
+    }).sort({ updatedAt: -1 });
     let uniqueUsers = []
     messages.map(message => {
       const user = message.users.filter(item => item !== req.user.userId)[0];
