@@ -108,7 +108,7 @@ router.post("/login", async (req, res, next) => {
   
 router.post('/token', (req, res, next) => {
     try {
-        const refreshToken = req.body.token;
+        const refreshToken = req.body.refreshToken;
         if(!refreshToken) return res.sendStatus(401);
         if(!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
 
