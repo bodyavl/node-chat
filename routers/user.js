@@ -150,7 +150,7 @@ function authToken(req, res, next) {
 }
 
 function generateAccessToken(user) {
-  return jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 30 });
+  return jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
 }
 
 function generateRefreshToken(user) {
