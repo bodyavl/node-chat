@@ -8,8 +8,7 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../database/models/user");
 const Message = require("../database/models/message");
-
-let refreshTokens = [];
+const RefreshToken = require('../database/models/refreshToken')
 
 router.get('/search', authToken, async(req, res, next) => {
   try {
@@ -34,7 +33,7 @@ router.post('/signup', async (req, res, next) => {
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
 
-        refreshTokens.push(refreshToken);
+        await RefreshToken.create({value: refreshToken})
     
         res.status(200).send({ accessToken, refreshToken, username: user.username });
       } catch (error) {
@@ -97,8 +96,7 @@ router.post("/login", async (req, res, next) => {
       if (isMatch) {
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
-        refreshTokens.push(refreshToken);
-        console.log(refreshTokens)
+        await RefreshToken.create({value: refreshToken})
         
         res.status(200).send({ ...user._doc, accessToken, refreshToken });  
       } else res.sendStatus(403);
@@ -111,26 +109,28 @@ router.post('/token', (req, res, next) => {
     try {
         const refreshToken = req.body.refreshToken;
         if(!refreshToken) return res.sendStatus(401);
-        console.log(refreshTokens)
-        if(!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+        const token = RefreshToken.findOne({ value: refreshToken } )
+        if(!token) return res.sendStatus(403);
 
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-        if (err) res.sendStatus(401);
-        refreshTokens = refreshTokens.filter(token => token !== refreshToken);
-        const newRefreshToken = generateRefreshToken({_id: user.userId })
-        const accessToken = generateAccessToken({_id: user.userId });
-        res.json({ accessToken, refreshToken: newRefreshToken })
+        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, user) => {
+          if (err) res.sendStatus(401);
+          await RefreshToken.findOneAndRemove({ value: refreshToken })
+          const newRefreshToken = generateRefreshToken({_id: user.userId })
+          await RefreshToken.create({value: newRefreshToken})
+          const accessToken = generateAccessToken({_id: user.userId });
+          res.json({ accessToken, refreshToken: newRefreshToken })
         })
     } catch (error) {
         next(error);
     }
 })
 
-router.delete('/logout', (req, res, next) => {
+router.delete('/logout', async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
     if(!refreshToken) throw new Error("No token provided");
-    refreshTokens = refreshTokens.filter(token => token !== refreshToken);
+    const token = await RefreshToken.findOneAndRemove({ value: refreshToken })
+    if(!token) res.sendStatus(401);
     res.sendStatus(200);
   } catch (error) {
     next(error);
