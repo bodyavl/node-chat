@@ -14,7 +14,7 @@ let refreshTokens = [];
 router.get('/search', authToken, async(req, res, next) => {
   try {
     const { q } = req.query;
-    const users = await User.find({ _id: { $ne: req.user.userId }, username: { $regex: `(?i)${q}(?-i)`,} }).select('_id username');;
+    const users = await User.find({ _id: { $ne: req.user.userId }, username: { $regex: `(?i)${q}(?-i)`,} }).select('_id username');
     res.json(users);
   } catch (error) {
     next(error);
@@ -98,6 +98,7 @@ router.post("/login", async (req, res, next) => {
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
         refreshTokens.push(refreshToken);
+        console.log(refreshTokens)
         
         res.status(200).send({ ...user._doc, accessToken, refreshToken });  
       } else res.sendStatus(403);
@@ -110,6 +111,7 @@ router.post('/token', (req, res, next) => {
     try {
         const refreshToken = req.body.refreshToken;
         if(!refreshToken) return res.sendStatus(401);
+        console.log(refreshTokens)
         if(!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
 
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
@@ -148,7 +150,7 @@ function authToken(req, res, next) {
 }
 
 function generateAccessToken(user) {
-  return jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+  return jwt.sign({ userId: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 30 });
 }
 
 function generateRefreshToken(user) {
