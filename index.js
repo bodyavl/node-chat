@@ -9,7 +9,6 @@ const http = require('http').Server(app);
 const cors = require('cors');
 const { userRouter } = require('./routers/user');
 const { messageRouter } = require('./routers/message.js')
-const Message = require('./database/models/message');
 
 const io = require('socket.io')(http, {
     cors: {
@@ -43,10 +42,10 @@ io.on('connection', (socket) => {
     global.chatSocket = socket;
     onlineUsers.set(socket.userId, socket.id);
 
-    socket.on("private message", ({ content, to }) => {
+    socket.on("private message", ({ content, from, to }) => {
         const sendUserSocket = onlineUsers.get(to);
         if (sendUserSocket) {
-          socket.to(sendUserSocket).emit("receive message", content);
+          socket.to(sendUserSocket).emit("receive message", { content, from }); 
         }
     })
     socket.on('disconnect', (reason) => {
