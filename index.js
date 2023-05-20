@@ -45,7 +45,7 @@ io.on('connection', (socket) => {
     socket.on("private message", ({ content, from, to }) => {
         const sendUserSocket = onlineUsers.get(to);
         if (sendUserSocket) {
-          socket.to(sendUserSocket).emit("receive message", { content, from }); 
+          socket.to(sendUserSocket).emit("receive message", content, from ); 
         }
     })
     socket.on('disconnect', (reason) => {
